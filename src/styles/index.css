@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --font-family-display: system-ui, sans-serif;
+  --animate-pulse-fast: pulse 0.5s ease-in-out;
+  --animate-bounce-in: bounceIn 0.3s ease-out;
+  --animate-shake: shake 0.4s ease-in-out;
+  --animate-flash-green: flashGreen 0.4s ease-out;
+  --animate-flash-red: flashRed 0.4s ease-out;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes flashGreen {
+  0% {
+    background-color: rgba(34, 197, 94, 0);
+  }
+  30% {
+    background-color: rgba(34, 197, 94, 0.6);
+  }
+  100% {
+    background-color: rgba(34, 197, 94, 0);
+  }
+}
+
+@keyframes flashRed {
+  0% {
+    background-color: rgba(239, 68, 68, 0);
+  }
+  30% {
+    background-color: rgba(239, 68, 68, 0.6);
+  }
+  100% {
+    background-color: rgba(239, 68, 68, 0);
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #app {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: #0f172a;
+    color: white;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  .quadrant-flash-correct {
+    animation: flashGreen 0.5s ease-out forwards;
+  }
+  .quadrant-flash-wrong {
+    animation: flashRed 0.5s ease-out forwards;
+  }
+  .text-shadow-lg {
+    text-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.8),
+      0 0 20px rgba(0, 0, 0, 0.5);
+  }
+  .video-mirror {
+    transform: scaleX(-1);
+  }
+}
