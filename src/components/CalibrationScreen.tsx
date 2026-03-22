@@ -75,10 +75,10 @@ export default function CalibrationScreen() {
 
   if (cameraError) {
     return (
-      <div class="h-screen flex flex-col items-center justify-center bg-slate-900 px-6 text-center">
+      <div class="h-screen flex flex-col items-center justify-center bg-indigo-950 px-6 text-center">
         <div class="text-6xl mb-4">📷</div>
         <h2 class="text-2xl font-bold text-white mb-3">Camera not available</h2>
-        <p class="text-slate-400 mb-6 max-w-sm">
+        <p class="text-white/55 mb-6 max-w-sm">
           No worries — you can still play using keyboard or touch controls.
         </p>
         <button
@@ -100,17 +100,17 @@ export default function CalibrationScreen() {
   }
 
   return (
-    <div class="h-screen flex flex-col bg-slate-900">
+    <div class="h-screen flex flex-col bg-indigo-950">
       {/* Header */}
       <div class="px-6 pt-6 pb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={handleSkip}
-          class="text-slate-400 hover:text-white text-sm transition-colors"
+          class="text-white/55 hover:text-white text-sm transition-colors"
         >
           Skip calibration
         </button>
-        <span class="text-slate-500 text-sm">Camera Setup</span>
+        <span class="text-white/40 text-sm">Camera Setup</span>
       </div>
 
       {/* Camera preview */}
@@ -131,22 +131,22 @@ export default function CalibrationScreen() {
           <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 pointer-events-none">
             <div class="border-r border-b border-white/20 flex items-start justify-start p-4">
               <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center">
-                <span class="text-yellow-400 font-bold text-xs">TL</span>
+                <span class="text-yellow-400 text-xl">↖</span>
               </div>
             </div>
             <div class="border-b border-white/20 flex items-start justify-end p-4">
               <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center animate-pulse">
-                <span class="text-yellow-400 font-bold text-xs">TR</span>
+                <span class="text-yellow-400 text-xl">↗</span>
               </div>
             </div>
             <div class="border-r border-white/20 flex items-end justify-start p-4">
               <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center">
-                <span class="text-yellow-400 font-bold text-xs">BL</span>
+                <span class="text-yellow-400 text-xl">↙</span>
               </div>
             </div>
             <div class="flex items-end justify-end p-4">
               <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center">
-                <span class="text-yellow-400 font-bold text-xs">BR</span>
+                <span class="text-yellow-400 text-xl">↘</span>
               </div>
             </div>
           </div>
@@ -173,20 +173,20 @@ export default function CalibrationScreen() {
         {step === "setup" && (
           <>
             <h2 class="text-xl font-bold text-white mb-2">Set up your space</h2>
-            <p class="text-slate-400 mb-6">
+            <p class="text-white/55 mb-6">
               Stand back so your upper body is visible. Clear about an arm's
               length of space around you.
             </p>
             <div class="flex gap-3 text-sm text-slate-300 mb-6">
-              <div class="flex-1 bg-slate-800 rounded-xl p-3 text-center">
+              <div class="flex-1 bg-white/8 rounded-xl p-3 text-center">
                 <div class="text-2xl mb-1">📏</div>
                 <p>1–2m from camera</p>
               </div>
-              <div class="flex-1 bg-slate-800 rounded-xl p-3 text-center">
+              <div class="flex-1 bg-white/8 rounded-xl p-3 text-center">
                 <div class="text-2xl mb-1">💡</div>
                 <p>Good lighting</p>
               </div>
-              <div class="flex-1 bg-slate-800 rounded-xl p-3 text-center">
+              <div class="flex-1 bg-white/8 rounded-xl p-3 text-center">
                 <div class="text-2xl mb-1">🧹</div>
                 <p>Clear space</p>
               </div>
@@ -203,7 +203,7 @@ export default function CalibrationScreen() {
 
         {step === "measuring" && (
           <div class="flex-1 flex items-center justify-center">
-            <p class="text-slate-400 text-center">
+            <p class="text-white/55 text-center">
               Hold still for a second while we calibrate to your environment...
             </p>
           </div>
@@ -212,11 +212,11 @@ export default function CalibrationScreen() {
         {step === "test" && (
           <>
             <h2 class="text-xl font-bold text-white mb-2">Test a punch!</h2>
-            <p class="text-slate-400 mb-6">
+            <p class="text-white/55 mb-6">
               Make a clear punching or swiping motion toward any corner. Big,
               decisive movements work best.
             </p>
-            <div class="bg-slate-800 rounded-xl p-4 mb-6 text-sm text-slate-300">
+            <div class="bg-white/8 rounded-xl p-4 mb-6 text-sm text-slate-300">
               <p class="text-yellow-400 font-semibold mb-1">💡 Tips</p>
               <ul class="space-y-1">
                 <li>• You don't need to actually punch — a fast swipe works</li>
@@ -237,7 +237,7 @@ export default function CalibrationScreen() {
         {step === "done" && (
           <>
             <h2 class="text-xl font-bold text-white mb-2">All set! 🎉</h2>
-            <p class="text-slate-400 mb-6">
+            <p class="text-white/55 mb-6">
               Calibration complete. Detection threshold set to match your
               environment.
             </p>

@@ -440,7 +440,7 @@ export default function GameScreen() {
 
       {/* Background when no camera */}
       <div
-        class={`absolute inset-0 bg-slate-900 transition-opacity ${cameraActive ? "opacity-0" : "opacity-100"}`}
+        class={`absolute inset-0 bg-indigo-950 transition-opacity ${cameraActive ? "opacity-0" : "opacity-100"}`}
       />
 
       {/* ── HUD — floated absolutely so the quadrant grid can be full-screen ── */}
@@ -487,7 +487,7 @@ export default function GameScreen() {
         {/* Time Attack: big countdown */}
         {isTimeAttack && phase !== "loading" && (
           <div
-            class={`text-center py-1 text-2xl font-black tabular-nums ${timerWarn ? "text-red-400" : "text-white/50"}`}
+            class={`text-center py-1 text-3xl font-display tabular-nums ${timerWarn ? "text-red-400" : "text-white/50"}`}
           >
             {timeLeft}s
           </div>
@@ -519,7 +519,7 @@ export default function GameScreen() {
                 <div class={`${pos.alignClass} flex w-full h-full`}>
                   <div
                     class={`
-                      relative px-4 py-2 md:px-6 md:py-3 rounded-2xl font-black text-2xl md:text-4xl transition-all duration-200 shadow-lg
+                      relative px-5 py-3 md:px-7 md:py-4 rounded-2xl font-display text-4xl md:text-6xl transition-all duration-200 shadow-lg
                       ${showGreen ? "bg-green-500 text-white scale-110 shadow-green-500/40" : ""}
                       ${showRed ? "bg-red-500   text-white scale-95  shadow-red-500/40" : ""}
                       ${!showGreen && !showRed ? "bg-black/65 text-white backdrop-blur-sm" : ""}
@@ -545,13 +545,12 @@ export default function GameScreen() {
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="text-center px-2">
               <div class="inline-block bg-black/75 backdrop-blur-md rounded-2xl px-6 py-4 shadow-2xl">
-                <div class="text-4xl md:text-6xl font-black text-white leading-none">
+                <div class="text-5xl md:text-7xl font-display text-white leading-none">
                   {currentQ.text}
                 </div>
-                <div class="text-slate-400 text-sm mt-1">= ?</div>
                 {!isTimeAttack && phase === "question" && (
                   <div
-                    class={`text-3xl font-black mt-2 tabular-nums leading-none transition-colors ${
+                    class={`text-4xl font-display mt-2 tabular-nums leading-none transition-colors ${
                       timerUrgent
                         ? "text-red-400"
                         : timerWarn
@@ -588,9 +587,9 @@ export default function GameScreen() {
         <div class="absolute inset-0 flex items-center justify-center">
           {phase === "countdown" ? (
             <div
-              class={`font-black tabular-nums drop-shadow-2xl select-none transition-all duration-150 ${
+              class={`font-display tabular-nums drop-shadow-2xl select-none transition-all duration-150 ${
                 countdownVal === 0
-                  ? "text-green-400 text-7xl"
+                  ? "text-green-400 text-8xl"
                   : "text-white text-9xl"
               }`}
             >
@@ -614,8 +613,8 @@ export default function GameScreen() {
 
       {/* Keyboard hint (no camera) */}
       {!cameraActive && phase === "question" && (
-        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 text-white/40 text-xs px-3 py-1.5 rounded-full pointer-events-none">
-          Tap corners or press Q · E · Z · C
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 text-white/60 text-sm px-4 py-2 rounded-full pointer-events-none">
+          Tap a corner · or press <span class="font-mono">Q · E · Z · C</span>
         </div>
       )}
     </div>

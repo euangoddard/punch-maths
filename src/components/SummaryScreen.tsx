@@ -42,22 +42,22 @@ export default function SummaryScreen() {
   const correctResults = results.results.filter((r) => r.correct);
 
   return (
-    <div class="h-screen overflow-y-auto bg-slate-900 flex flex-col items-center py-8 px-4">
+    <div class="h-screen overflow-y-auto bg-indigo-950 flex flex-col items-center py-8 px-4">
       <div class="w-full max-w-md">
         {/* Header */}
         <div class="text-center mb-8">
           <div class="text-6xl mb-2">{rating.emoji}</div>
-          <h1 class={`text-3xl font-black mb-1 ${rating.color}`}>
+          <h1 class={`text-4xl font-display mb-1 ${rating.color}`}>
             {rating.label}
           </h1>
-          <p class="text-slate-400 text-sm">
+          <p class="text-white/50 text-sm">
             {MODE_LABELS[results.mode]} ·{" "}
             {DIFFICULTY_LABELS[results.difficulty]}
           </p>
         </div>
 
-        {/* Main stats */}
-        <div class="grid grid-cols-2 gap-3 mb-4">
+        {/* Main stats — score hero + secondary row */}
+        <div class="mb-3">
           <StatCard
             value={results.score}
             label="Score"
@@ -68,10 +68,12 @@ export default function SummaryScreen() {
             }
             highlight
           />
+        </div>
+        <div class="grid grid-cols-3 gap-3 mb-6">
           <StatCard
             value={`${results.accuracy}%`}
             label="Accuracy"
-            sub={`${correctResults.length} / ${results.results.length} correct`}
+            sub={`${correctResults.length} / ${results.results.length}`}
             color={
               results.accuracy >= 80
                 ? "text-green-400"
@@ -86,34 +88,37 @@ export default function SummaryScreen() {
                 ? `${(results.avgReactionMs / 1000).toFixed(1)}s`
                 : "—"
             }
-            label="Avg reaction"
-            sub="per question"
+            label="Reaction"
+            sub="avg per Q"
           />
           <StatCard
             value={results.bestStreak}
-            label="Best streak"
-            sub={results.bestStreak >= 3 ? "🔥 on fire!" : "correct in a row"}
+            label="Streak"
+            sub={results.bestStreak >= 3 ? "🔥 on fire!" : "best in a row"}
             color={
               results.bestStreak >= 5
                 ? "text-orange-400"
                 : results.bestStreak >= 3
                   ? "text-yellow-400"
-                  : "text-slate-300"
+                  : "text-white/55"
             }
           />
         </div>
 
         {/* Question breakdown */}
         {results.results.length > 0 && (
-          <div class="bg-slate-800 rounded-2xl overflow-hidden mb-6">
-            <div class="px-4 py-3 border-b border-slate-700">
+          <div class="bg-white/8 rounded-2xl overflow-hidden mb-6">
+            <div class="px-4 py-3 border-b border-white/10">
               <h2 class="font-bold text-white text-sm">Question breakdown</h2>
             </div>
-            <div class="divide-y divide-slate-700/50">
+            <div class="divide-y divide-white/8">
               {results.results.map((r, i) => (
-                <div key={i} class="flex items-center gap-3 px-4 py-2.5">
+                <div
+                  key={i}
+                  class={`flex items-center gap-3 px-4 py-2.5 border-l-2 ${r.correct ? "border-emerald-500" : "border-red-500"}`}
+                >
                   <span
-                    class={`text-lg ${r.correct ? "text-green-400" : "text-red-400"}`}
+                    class={`text-lg ${r.correct ? "text-emerald-400" : "text-red-400"}`}
                   >
                     {r.correct ? "✓" : "✗"}
                   </span>
@@ -121,7 +126,7 @@ export default function SummaryScreen() {
                     {r.question} ={" "}
                     <span class="text-yellow-400 font-bold">{r.answer}</span>
                   </span>
-                  <span class="text-slate-500 text-xs tabular-nums">
+                  <span class="text-white/35 text-xs tabular-nums">
                     {r.reactionMs > 0
                       ? `${(r.reactionMs / 1000).toFixed(1)}s`
                       : "timeout"}
@@ -148,7 +153,7 @@ export default function SummaryScreen() {
             onClick={() => {
               screen.value = "home";
             }}
-            class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-2xl transition-all active:scale-95"
+            class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all active:scale-95"
           >
             Change settings
           </button>
@@ -186,15 +191,25 @@ interface StatCardProps {
 function StatCard({ value, label, sub, highlight, color }: StatCardProps) {
   return (
     <div
-      class={`rounded-2xl p-4 text-center ${highlight ? "bg-yellow-400/10 border-2 border-yellow-400/50" : "bg-slate-800"}`}
+      class={`rounded-2xl text-center ${highlight ? "p-6 bg-yellow-400/10 border-2 border-yellow-400/50" : "p-4 bg-white/8"}`}
     >
       <div
-        class={`text-3xl font-black mb-0.5 ${color ?? (highlight ? "text-yellow-400" : "text-white")}`}
+        class={`font-display mb-0.5 ${highlight ? "text-5xl" : "text-3xl"} ${color ?? (highlight ? "text-yellow-400" : "text-white")}`}
       >
         {value}
       </div>
-      <div class="text-white text-sm font-semibold">{label}</div>
-      {sub && <div class="text-slate-400 text-xs mt-0.5">{sub}</div>}
+      <div
+        class={`text-white font-semibold ${highlight ? "text-base" : "text-sm"}`}
+      >
+        {label}
+      </div>
+      {sub && (
+        <div
+          class={`text-white/45 mt-0.5 ${highlight ? "text-sm" : "text-xs"}`}
+        >
+          {sub}
+        </div>
+      )}
     </div>
   );
 }

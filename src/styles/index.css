@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-family-display: system-ui, sans-serif;
+  --font-family-display: "Anton", system-ui, sans-serif;
   --animate-pulse-fast: pulse 0.5s ease-in-out;
   --animate-bounce-in: bounceIn 0.3s ease-out;
   --animate-shake: shake 0.4s ease-in-out;
@@ -68,9 +68,10 @@
     width: 100%;
     margin: 0;
     padding: 0;
-    background: #0f172a;
+    background: #1e1b4b;
     color: white;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
   }
 }
 
