@@ -100,7 +100,7 @@ export default function CalibrationScreen() {
   }
 
   return (
-    <div class="h-screen flex flex-col bg-indigo-950">
+    <div class="h-screen flex flex-col bg-indigo-950 overflow-hidden">
       {/* Header */}
       <div class="px-6 pt-6 pb-3 flex items-center justify-between">
         <button

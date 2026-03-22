@@ -64,7 +64,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <div class="h-screen flex flex-col items-center justify-center bg-indigo-950 px-4 select-none">
+    <div class="min-h-screen flex flex-col items-center justify-center bg-indigo-950 px-4 py-8 select-none overflow-y-auto">
       {/* Title */}
       <div class="text-center mb-8">
         <div class="text-8xl mb-2" role="img" aria-label="punch">
