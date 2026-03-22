@@ -1,21 +1,3 @@
-// Hand overlay + punch detection via MediaPipe HandLandmarker.
-//
-// Position tracking uses only the 5 stable palm landmarks (wrist + 4 MCPs)
-// rather than all 21, because fingertips are noisy and inflate jitter.
-// An EMA filter smooths the tracked position so landmark jitter doesn't
-// accumulate into false velocity spikes.
-//
-// A punch is registered when:
-//   1. Smoothed velocity exceeds `punchThreshold` (default 0.08 normalised/frame)
-//   2. The hand is in the outer half of a quadrant — within 0–0.35 of that
-//      quadrant's corner in display space — so casual movement near the screen
-//      centre cannot trigger a corner target.
-//
-// Display space mirrors the raw landmark x-axis to match the CSS-mirrored
-// video feed, so left/right map correctly to what the player sees.
-//
-// WASM runtime and model are loaded from CDN to avoid Vite asset-serving config.
-
 import {
   DrawingUtils,
   FilesetResolver,

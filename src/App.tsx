@@ -21,12 +21,11 @@ export const gameResults = signal<GameResults | null>(null);
 function loadCalibration(): CalibrationData | null {
   try {
     const raw = localStorage.getItem("punch-maths-calibration");
-    if (!raw) return null;
+    if (!raw) {
+      return null;
+    }
     const parsed = JSON.parse(raw);
-    if (
-      typeof parsed?.threshold !== "number" ||
-      typeof parsed?.calibratedAt !== "number"
-    ) {
+    if (typeof parsed?.calibratedAt !== "number") {
       return null;
     }
     return parsed as CalibrationData;

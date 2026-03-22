@@ -1,19 +1,66 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { saveCalibration, screen } from "../App";
+import { HandOverlay } from "../detection/handOverlay";
+import type { Quadrant } from "../types";
 
-const DEFAULT_THRESHOLD = 12000;
+type CalibrationStep = "setup" | "loading" | "hitting" | "done";
 
-type CalibrationStep = "setup" | "measuring" | "test" | "done";
+const ALL_QUADRANTS: Quadrant[] = [
+  "top-left",
+  "top-right",
+  "bottom-left",
+  "bottom-right",
+];
+
+const QUADRANT_META: Record<
+  Quadrant,
+  {
+    arrow: string;
+    gridClass: string;
+    alignClass: string;
+    border: string;
+    padding: string;
+  }
+> = {
+  "top-left": {
+    arrow: "↖",
+    gridClass: "col-start-1 row-start-1",
+    alignClass: "items-start justify-start",
+    border: "border-r border-b",
+    padding: "p-8",
+  },
+  "top-right": {
+    arrow: "↗",
+    gridClass: "col-start-2 row-start-1",
+    alignClass: "items-start justify-end",
+    border: "border-b",
+    padding: "p-8",
+  },
+  "bottom-left": {
+    arrow: "↙",
+    gridClass: "col-start-1 row-start-2",
+    alignClass: "items-end justify-start",
+    border: "border-r",
+    padding: "pt-8 px-8 pb-52",
+  },
+  "bottom-right": {
+    arrow: "↘",
+    gridClass: "col-start-2 row-start-2",
+    alignClass: "items-end justify-end",
+    border: "",
+    padding: "pt-8 px-8 pb-52",
+  },
+};
 
 export default function CalibrationScreen() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const overlayRef = useRef<HandOverlay | null>(null);
   const [step, setStep] = useState<CalibrationStep>("setup");
   const [cameraError, setCameraError] = useState(false);
-  const [threshold] = useState(DEFAULT_THRESHOLD);
-  const [testPassed, setTestPassed] = useState(false);
+  const [hitQuadrants, setHitQuadrants] = useState<Set<Quadrant>>(new Set());
 
-  // Start camera
   useEffect(() => {
     async function startCamera() {
       try {
@@ -36,41 +83,57 @@ export default function CalibrationScreen() {
     startCamera();
 
     return () => {
-      streamRef.current?.getTracks().forEach((t) => {
-        t.stop();
-      });
+      overlayRef.current?.stop();
+      streamRef.current?.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
-  async function handleMeasure() {
-    setStep("measuring");
-    // Brief pause while MediaPipe warms up in the background
-    await new Promise((r) => setTimeout(r, 1500));
-    setStep("test");
+  async function handleReady() {
+    setStep("loading");
+    try {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas) {
+        setStep("done");
+        return;
+      }
+      const overlay = new HandOverlay(video, canvas, { onPunch: handlePunch });
+      overlayRef.current = overlay;
+      await overlay.init();
+      overlay.start();
+      setStep("hitting");
+    } catch {
+      // Model failed to load — skip straight to done
+      setStep("done");
+    }
   }
 
-  async function handleTestPunch() {
-    setTestPassed(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setStep("done");
+  function handlePunch(quadrant: Quadrant) {
+    setHitQuadrants((prev) => {
+      const next = new Set(prev);
+      next.add(quadrant);
+      if (next.size === ALL_QUADRANTS.length) {
+        setTimeout(() => setStep("done"), 600);
+      }
+      return next;
+    });
   }
 
   function handleFinish() {
-    saveCalibration({ threshold, calibratedAt: Date.now() });
-    stopCamera();
+    saveCalibration({ calibratedAt: Date.now() });
+    stopAll();
     screen.value = "playing";
   }
 
   function handleSkip() {
-    saveCalibration({ threshold: DEFAULT_THRESHOLD, calibratedAt: Date.now() });
-    stopCamera();
+    saveCalibration({ calibratedAt: Date.now() });
+    stopAll();
     screen.value = "playing";
   }
 
-  function stopCamera() {
-    streamRef.current?.getTracks().forEach((t) => {
-      t.stop();
-    });
+  function stopAll() {
+    overlayRef.current?.stop();
+    streamRef.current?.getTracks().forEach((t) => t.stop());
   }
 
   if (cameraError) {
@@ -85,7 +148,6 @@ export default function CalibrationScreen() {
           type="button"
           onClick={() => {
             saveCalibration({
-              threshold: DEFAULT_THRESHOLD,
               calibratedAt: Date.now(),
               noCamera: true,
             });
@@ -100,9 +162,64 @@ export default function CalibrationScreen() {
   }
 
   return (
-    <div class="h-screen flex flex-col bg-indigo-950 overflow-hidden">
+    <div class="h-screen w-screen relative overflow-hidden bg-indigo-950 select-none touch-none">
+      {/* Full-screen camera feed */}
+      <video
+        ref={videoRef}
+        class="absolute inset-0 w-full h-full object-cover video-mirror opacity-70"
+        muted
+        playsInline
+        autoPlay
+      />
+      <canvas
+        ref={canvasRef}
+        class="absolute inset-0 w-full h-full video-mirror pointer-events-none"
+      />
+
+      {/* Quadrant targets — full-screen grid so corners align with actual hit zones */}
+      {step === "hitting" && (
+        <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 pointer-events-none">
+          {ALL_QUADRANTS.map((q) => {
+            const meta = QUADRANT_META[q];
+            const hit = hitQuadrants.has(q);
+            return (
+              <div
+                key={q}
+                class={`${meta.gridClass} ${meta.border} border-white/15 flex ${meta.alignClass} ${meta.padding}`}
+              >
+                <div
+                  class={`w-20 h-20 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                    hit
+                      ? "bg-green-500 border-green-400 scale-110"
+                      : "bg-yellow-400/20 border-yellow-400 animate-pulse"
+                  }`}
+                >
+                  {hit ? (
+                    <span class="text-white text-3xl font-bold">✓</span>
+                  ) : (
+                    <span class="text-yellow-400 text-3xl">{meta.arrow}</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Loading spinner overlay */}
+      {step === "loading" && (
+        <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+          <div class="text-center">
+            <div class="w-14 h-14 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p class="text-white font-semibold text-lg">
+              Loading hand detection…
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
-      <div class="px-6 pt-6 pb-3 flex items-center justify-between">
+      <div class="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-6 pt-6 pb-3">
         <button
           type="button"
           onClick={handleSkip}
@@ -113,138 +230,81 @@ export default function CalibrationScreen() {
         <span class="text-white/40 text-sm">Camera Setup</span>
       </div>
 
-      {/* Camera preview */}
+      {/* Bottom panel — instructions + action */}
       <div
-        class="relative mx-4 rounded-2xl overflow-hidden bg-black flex-shrink-0"
-        style="aspect-ratio: 4/3; max-height: 45vh"
+        class="absolute bottom-0 left-0 right-0 z-10 px-6 pb-8 pt-6"
+        style="background: linear-gradient(to top, rgba(15,10,40,0.92) 70%, transparent)"
       >
-        <video
-          ref={videoRef}
-          class="w-full h-full object-cover video-mirror"
-          muted
-          playsInline
-          autoPlay
-        />
-
-        {/* Quadrant overlay for test step */}
-        {step === "test" && !testPassed && (
-          <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 pointer-events-none">
-            <div class="border-r border-b border-white/20 flex items-start justify-start p-4">
-              <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center">
-                <span class="text-yellow-400 text-xl">↖</span>
-              </div>
-            </div>
-            <div class="border-b border-white/20 flex items-start justify-end p-4">
-              <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center animate-pulse">
-                <span class="text-yellow-400 text-xl">↗</span>
-              </div>
-            </div>
-            <div class="border-r border-white/20 flex items-end justify-start p-4">
-              <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center">
-                <span class="text-yellow-400 text-xl">↙</span>
-              </div>
-            </div>
-            <div class="flex items-end justify-end p-4">
-              <div class="w-12 h-12 rounded-full bg-yellow-400/30 border-2 border-yellow-400 flex items-center justify-center">
-                <span class="text-yellow-400 text-xl">↘</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {testPassed && (
-          <div class="absolute inset-0 flex items-center justify-center bg-green-500/30">
-            <div class="text-5xl">✅</div>
-          </div>
-        )}
-
-        {step === "measuring" && (
-          <div class="absolute inset-0 flex items-center justify-center bg-black/50">
-            <div class="text-center">
-              <div class="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-              <p class="text-white font-semibold">Stay still...</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Instructions */}
-      <div class="flex-1 px-6 pt-5 pb-6 flex flex-col">
         {step === "setup" && (
           <>
-            <h2 class="text-xl font-bold text-white mb-2">Set up your space</h2>
-            <p class="text-white/55 mb-6">
+            <h2 class="text-xl font-bold text-white mb-1">Set up your space</h2>
+            <p class="text-white/55 mb-5 text-sm">
               Stand back so your upper body is visible. Clear about an arm's
-              length of space around you.
+              length around you.
             </p>
-            <div class="flex gap-3 text-sm text-slate-300 mb-6">
-              <div class="flex-1 bg-white/8 rounded-xl p-3 text-center">
-                <div class="text-2xl mb-1">📏</div>
-                <p>1–2m from camera</p>
+            <div class="flex gap-3 text-sm text-slate-300 mb-5">
+              <div class="flex-1 bg-white/10 rounded-xl p-3 text-center">
+                <div class="text-xl mb-1">📏</div>
+                <p class="text-xs">1–2m away</p>
               </div>
-              <div class="flex-1 bg-white/8 rounded-xl p-3 text-center">
-                <div class="text-2xl mb-1">💡</div>
-                <p>Good lighting</p>
+              <div class="flex-1 bg-white/10 rounded-xl p-3 text-center">
+                <div class="text-xl mb-1">💡</div>
+                <p class="text-xs">Good lighting</p>
               </div>
-              <div class="flex-1 bg-white/8 rounded-xl p-3 text-center">
-                <div class="text-2xl mb-1">🧹</div>
-                <p>Clear space</p>
+              <div class="flex-1 bg-white/10 rounded-xl p-3 text-center">
+                <div class="text-xl mb-1">🧹</div>
+                <p class="text-xs">Clear space</p>
               </div>
             </div>
             <button
               type="button"
-              onClick={handleMeasure}
-              class="mt-auto w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold text-lg rounded-2xl transition-all active:scale-95"
+              onClick={handleReady}
+              class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold text-lg rounded-2xl transition-all active:scale-95"
             >
               I'm ready →
             </button>
           </>
         )}
 
-        {step === "measuring" && (
-          <div class="flex-1 flex items-center justify-center">
-            <p class="text-white/55 text-center">
-              Hold still for a second while we calibrate to your environment...
-            </p>
-          </div>
+        {step === "loading" && (
+          <p class="text-white/55 text-center text-sm">
+            Loading hand detection model…
+          </p>
         )}
 
-        {step === "test" && (
+        {step === "hitting" && (
           <>
-            <h2 class="text-xl font-bold text-white mb-2">Test a punch!</h2>
-            <p class="text-white/55 mb-6">
-              Make a clear punching or swiping motion toward any corner. Big,
-              decisive movements work best.
+            <h2 class="text-xl font-bold text-white mb-1">Hit each corner!</h2>
+            <p class="text-white/55 text-sm mb-4">
+              Reach toward each glowing corner and hold for a moment to
+              register.
             </p>
-            <div class="bg-white/8 rounded-xl p-4 mb-6 text-sm text-slate-300">
-              <p class="text-yellow-400 font-semibold mb-1">💡 Tips</p>
-              <ul class="space-y-1">
-                <li>• You don't need to actually punch — a fast swipe works</li>
-                <li>• Aim for the quadrant corner, not the camera</li>
-                <li>• Small movements are fine if you're seated</li>
-              </ul>
+            <div class="flex gap-2">
+              {ALL_QUADRANTS.map((q) => (
+                <div
+                  key={q}
+                  class={`flex-1 h-2 rounded-full transition-all duration-300 ${
+                    hitQuadrants.has(q) ? "bg-green-500" : "bg-white/20"
+                  }`}
+                />
+              ))}
             </div>
-            <button
-              type="button"
-              onClick={handleTestPunch}
-              class="mt-auto w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold text-lg rounded-2xl transition-all active:scale-95"
-            >
-              I made a punch ✊
-            </button>
+            <p class="text-white/35 text-xs text-center mt-2">
+              {hitQuadrants.size} / {ALL_QUADRANTS.length} corners hit
+            </p>
           </>
         )}
 
         {step === "done" && (
           <>
-            <h2 class="text-xl font-bold text-white mb-2">All set! 🎉</h2>
-            <p class="text-white/55 mb-6">
-              Calibration complete. Detection threshold set to match your
-              environment.
+            <h2 class="text-xl font-bold text-white mb-1">All set! 🎉</h2>
+            <p class="text-white/55 text-sm mb-5">
+              Hand detection is working. You're ready to play!
             </p>
             <button
               type="button"
               onClick={handleFinish}
-              class="mt-auto w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl rounded-2xl transition-all active:scale-95"
+              class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl rounded-2xl transition-all active:scale-95"
             >
               Let's play! 👊
             </button>

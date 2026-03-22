@@ -17,7 +17,6 @@ export interface GameConfig {
 }
 
 export interface CalibrationData {
-  threshold: number;
   calibratedAt: number;
   noCamera?: boolean;
 }
