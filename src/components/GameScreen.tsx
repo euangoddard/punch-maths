@@ -64,7 +64,6 @@ const QUADRANT_POSITIONS = [
 ];
 
 const CLASSIC_TOTAL = 10;
-const QUESTION_SECS = 5;
 const FEEDBACK_MS = 1400;
 
 type GamePhase = "loading" | "countdown" | "question" | "feedback" | "end";
@@ -86,7 +85,7 @@ export default function GameScreen() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(
-    isTimeAttack ? config.duration : QUESTION_SECS,
+    isTimeAttack ? config.duration : config.questionTimer,
   );
   const [results, setResults] = useState<GameResult[]>([]);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -202,7 +201,7 @@ export default function GameScreen() {
       clearInterval(timerRef.current);
     }
 
-    let t = QUESTION_SECS;
+    let t = config.questionTimer;
     setTimeLeft(t);
 
     timerRef.current = setInterval(() => {
@@ -416,17 +415,17 @@ export default function GameScreen() {
     0,
     isTimeAttack
       ? (timeLeft / config.duration) * 100
-      : (timeLeft / QUESTION_SECS) * 100,
+      : (timeLeft / config.questionTimer) * 100,
   );
   const timerUrgent = timeLeft <= 3;
   const timerWarn = timeLeft <= (isTimeAttack ? 10 : 3);
 
   return (
-    <div class="h-screen w-screen relative overflow-hidden bg-black select-none touch-none">
+    <div class="screen-container bg-black">
       {/* Camera feed — always in DOM so videoRef is always valid */}
       <video
         ref={videoRef}
-        class={`absolute inset-0 w-full h-full object-cover video-mirror transition-opacity duration-500 ${cameraActive ? "opacity-55" : "opacity-0"}`}
+        class={`overlay-fill object-cover video-mirror transition-opacity duration-500 ${cameraActive ? "opacity-55" : "opacity-0"}`}
         muted
         playsInline
         autoPlay
@@ -435,12 +434,12 @@ export default function GameScreen() {
       {/* Hand landmark overlay */}
       <canvas
         ref={overlayCanvasRef}
-        class="absolute inset-0 w-full h-full video-mirror pointer-events-none"
+        class="overlay-fill video-mirror pointer-events-none"
       />
 
       {/* Background when no camera */}
       <div
-        class={`absolute inset-0 bg-indigo-950 transition-opacity ${cameraActive ? "opacity-0" : "opacity-100"}`}
+        class={`overlay-fill bg-indigo-950 transition-opacity ${cameraActive ? "opacity-0" : "opacity-100"}`}
       />
 
       {/* ── HUD — floated absolutely so the quadrant grid can be full-screen ── */}

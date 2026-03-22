@@ -144,7 +144,7 @@ export default function SummaryScreen() {
             onClick={() => {
               screen.value = "playing";
             }}
-            class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl rounded-2xl transition-all active:scale-95"
+            class="btn-primary"
           >
             Play again 👊
           </button>
@@ -153,7 +153,7 @@ export default function SummaryScreen() {
             onClick={() => {
               screen.value = "home";
             }}
-            class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all active:scale-95"
+            class="btn-secondary"
           >
             Change settings
           </button>

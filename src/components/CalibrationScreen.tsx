@@ -162,18 +162,18 @@ export default function CalibrationScreen() {
   }
 
   return (
-    <div class="h-screen w-screen relative overflow-hidden bg-indigo-950 select-none touch-none">
+    <div class="screen-container bg-indigo-950">
       {/* Full-screen camera feed */}
       <video
         ref={videoRef}
-        class="absolute inset-0 w-full h-full object-cover video-mirror opacity-70"
+        class="overlay-fill object-cover video-mirror opacity-70"
         muted
         playsInline
         autoPlay
       />
       <canvas
         ref={canvasRef}
-        class="absolute inset-0 w-full h-full video-mirror pointer-events-none"
+        class="overlay-fill video-mirror pointer-events-none"
       />
 
       {/* Quadrant targets — full-screen grid so corners align with actual hit zones */}
@@ -301,11 +301,7 @@ export default function CalibrationScreen() {
             <p class="text-white/55 text-sm mb-5">
               Hand detection is working. You're ready to play!
             </p>
-            <button
-              type="button"
-              onClick={handleFinish}
-              class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl rounded-2xl transition-all active:scale-95"
-            >
+            <button type="button" onClick={handleFinish} class="btn-primary">
               Let's play! 👊
             </button>
           </>

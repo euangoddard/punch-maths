@@ -81,6 +81,21 @@
   }
 }
 
+@layer components {
+  .btn-primary {
+    @apply w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl rounded-2xl transition-all active:scale-95;
+  }
+  .btn-secondary {
+    @apply w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all active:scale-95;
+  }
+  .screen-container {
+    @apply h-screen w-screen relative overflow-hidden select-none touch-none;
+  }
+  .overlay-fill {
+    @apply absolute inset-0 w-full h-full;
+  }
+}
+
 @layer utilities {
   .quadrant-flash-correct {
     animation: flashGreen 0.5s ease-out forwards;

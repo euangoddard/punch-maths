@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { calibrationData, gameConfig, screen } from "../App";
 import { unlockAudio } from "../audio/sounds";
+import { DEFAULT_QUESTION_TIMER } from "../constants";
 import type { GameMode } from "../types";
 
 const DIFFICULTIES = [
@@ -41,7 +42,12 @@ export default function HomeScreen() {
 
   function handlePlay() {
     unlockAudio();
-    gameConfig.value = { mode, difficulty, duration, questionTimer: 5 };
+    gameConfig.value = {
+      mode,
+      difficulty,
+      duration,
+      questionTimer: DEFAULT_QUESTION_TIMER,
+    };
 
     // Skip calibration if already done, otherwise show it
     if (calibrationData.value) {
@@ -57,7 +63,7 @@ export default function HomeScreen() {
       mode,
       difficulty,
       duration,
-      questionTimer: 5,
+      questionTimer: DEFAULT_QUESTION_TIMER,
       keyboardOnly: true,
     };
     screen.value = "playing";
@@ -165,14 +171,14 @@ export default function HomeScreen() {
         <button
           type="button"
           onClick={handlePlay}
-          class="w-full py-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-yellow-400/30"
+          class="btn-primary hover:scale-[1.02] shadow-xl shadow-yellow-400/30"
         >
           📷 Play with Camera
         </button>
         <button
           type="button"
           onClick={handlePlayKeyboard}
-          class="w-full py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-base transition-all active:scale-95"
+          class="btn-secondary"
         >
           ⌨️ Play with Keyboard / Touch
         </button>

@@ -3,6 +3,7 @@ import CalibrationScreen from "./components/CalibrationScreen";
 import GameScreen from "./components/GameScreen";
 import HomeScreen from "./components/HomeScreen";
 import SummaryScreen from "./components/SummaryScreen";
+import { CALIBRATION_STORAGE_KEY, DEFAULT_QUESTION_TIMER } from "./constants";
 import type { CalibrationData, GameConfig, GameResults, Screen } from "./types";
 
 // Global app state signals
@@ -12,7 +13,7 @@ export const gameConfig = signal<GameConfig>({
   mode: "classic",
   difficulty: 2,
   duration: 60,
-  questionTimer: 5,
+  questionTimer: DEFAULT_QUESTION_TIMER,
 });
 
 export const gameResults = signal<GameResults | null>(null);
@@ -20,7 +21,7 @@ export const gameResults = signal<GameResults | null>(null);
 // Calibration: stored in localStorage, null means not calibrated
 function loadCalibration(): CalibrationData | null {
   try {
-    const raw = localStorage.getItem("punch-maths-calibration");
+    const raw = localStorage.getItem(CALIBRATION_STORAGE_KEY);
     if (!raw) {
       return null;
     }
@@ -36,7 +37,7 @@ function loadCalibration(): CalibrationData | null {
 
 export function saveCalibration(data: CalibrationData): void {
   try {
-    localStorage.setItem("punch-maths-calibration", JSON.stringify(data));
+    localStorage.setItem(CALIBRATION_STORAGE_KEY, JSON.stringify(data));
   } catch {
     // Storage may be unavailable
   }
