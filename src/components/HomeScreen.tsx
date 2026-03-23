@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { calibrationData, gameConfig, screen } from "../App";
+import { calibrationData, calibrationReturnTo, gameConfig, screen } from "../App";
 import { unlockAudio } from "../audio/sounds";
 import { DEFAULT_QUESTION_TIMER } from "../constants";
 import type { GameMode } from "../types";
@@ -168,13 +168,27 @@ export default function HomeScreen() {
 
       {/* Play buttons */}
       <div class="w-full max-w-md flex flex-col gap-3">
-        <button
-          type="button"
-          onClick={handlePlay}
-          class="btn-primary hover:scale-[1.02] shadow-xl shadow-yellow-400/30"
-        >
-          📷 Play with Camera
-        </button>
+        <div class="flex flex-col items-stretch gap-1">
+          <button
+            type="button"
+            onClick={handlePlay}
+            class="btn-primary hover:scale-[1.02] shadow-xl shadow-yellow-400/30"
+          >
+            📷 Play with Camera
+          </button>
+          {calibrationData.value && (
+            <button
+              type="button"
+              onClick={() => {
+                calibrationReturnTo.value = "home";
+                screen.value = "calibration";
+              }}
+              class="text-white/40 text-xs hover:text-white/60 transition-colors text-center py-1"
+            >
+              Recalibrate camera
+            </button>
+          )}
+        </div>
         <button
           type="button"
           onClick={handlePlayKeyboard}

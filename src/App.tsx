@@ -9,6 +9,9 @@ import type { CalibrationData, GameConfig, GameResults, Screen } from "./types";
 // Global app state signals
 export const screen = signal<Screen>("home");
 
+// Where to navigate after calibration completes ("playing" normally, "home" when recalibrating)
+export const calibrationReturnTo = signal<Screen>("playing");
+
 export const gameConfig = signal<GameConfig>({
   mode: "classic",
   difficulty: 2,

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { saveCalibration, screen } from "../App";
+import { calibrationReturnTo, saveCalibration, screen } from "../App";
 import { HandOverlay } from "../detection/handOverlay";
 import type { Quadrant } from "../types";
 
@@ -122,13 +122,17 @@ export default function CalibrationScreen() {
   function handleFinish() {
     saveCalibration({ calibratedAt: Date.now() });
     stopAll();
-    screen.value = "playing";
+    const dest = calibrationReturnTo.value;
+    calibrationReturnTo.value = "playing";
+    screen.value = dest;
   }
 
   function handleSkip() {
     saveCalibration({ calibratedAt: Date.now() });
     stopAll();
-    screen.value = "playing";
+    const dest = calibrationReturnTo.value;
+    calibrationReturnTo.value = "playing";
+    screen.value = dest;
   }
 
   function stopAll() {
@@ -151,7 +155,9 @@ export default function CalibrationScreen() {
               calibratedAt: Date.now(),
               noCamera: true,
             });
-            screen.value = "playing";
+            const dest = calibrationReturnTo.value;
+            calibrationReturnTo.value = "playing";
+            screen.value = dest;
           }}
           class="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold rounded-xl transition-all"
         >
