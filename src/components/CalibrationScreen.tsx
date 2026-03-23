@@ -141,7 +141,7 @@ export default function CalibrationScreen() {
       <div class="h-screen flex flex-col items-center justify-center bg-indigo-950 px-6 text-center">
         <div class="text-6xl mb-4">📷</div>
         <h2 class="text-2xl font-bold text-white mb-3">Camera not available</h2>
-        <p class="text-white/55 mb-6 max-w-sm">
+        <p class="text-white/60 mb-6 max-w-sm">
           No worries — you can still play using keyboard or touch controls.
         </p>
         <button
@@ -223,22 +223,19 @@ export default function CalibrationScreen() {
         <button
           type="button"
           onClick={handleSkip}
-          class="text-white/55 hover:text-white text-sm transition-colors"
+          class="text-white/60 hover:text-white text-sm transition-colors"
         >
           Skip calibration
         </button>
-        <span class="text-white/40 text-sm">Camera Setup</span>
+        <span class="text-white/60 text-sm">Camera Setup</span>
       </div>
 
       {/* Bottom panel — instructions + action */}
-      <div
-        class="absolute bottom-0 left-0 right-0 z-10 px-6 pb-8 pt-6"
-        style="background: linear-gradient(to top, rgba(15,10,40,0.92) 70%, transparent)"
-      >
+      <div class="absolute bottom-0 left-0 right-0 z-10 px-6 pb-8 pt-6 bg-gradient-to-t from-indigo-950/95 via-indigo-950/80 to-transparent">
         {step === "setup" && (
           <>
             <h2 class="text-xl font-bold text-white mb-1">Set up your space</h2>
-            <p class="text-white/55 mb-5 text-sm">
+            <p class="text-white/60 mb-5 text-sm">
               Stand back so your upper body is visible. Clear about an arm's
               length around you.
             </p>
@@ -267,7 +264,7 @@ export default function CalibrationScreen() {
         )}
 
         {step === "loading" && (
-          <p class="text-white/55 text-center text-sm">
+          <p class="text-white/60 text-center text-sm">
             Loading hand detection model…
           </p>
         )}
@@ -275,7 +272,7 @@ export default function CalibrationScreen() {
         {step === "hitting" && (
           <>
             <h2 class="text-xl font-bold text-white mb-1">Hit each corner!</h2>
-            <p class="text-white/55 text-sm mb-4">
+            <p class="text-white/60 text-sm mb-4">
               Reach toward each glowing corner and hold for a moment to
               register.
             </p>
@@ -289,7 +286,7 @@ export default function CalibrationScreen() {
                 />
               ))}
             </div>
-            <p class="text-white/35 text-xs text-center mt-2">
+            <p class="text-white/50 text-xs text-center mt-2">
               {hitQuadrants.size} / {ALL_QUADRANTS.length} corners hit
             </p>
           </>
@@ -298,7 +295,7 @@ export default function CalibrationScreen() {
         {step === "done" && (
           <>
             <h2 class="text-xl font-bold text-white mb-1">All set! 🎉</h2>
-            <p class="text-white/55 text-sm mb-5">
+            <p class="text-white/60 text-sm mb-5">
               Hand detection is working. You're ready to play!
             </p>
             <button type="button" onClick={handleFinish} class="btn-primary">

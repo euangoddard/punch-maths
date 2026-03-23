@@ -50,7 +50,7 @@ export default function SummaryScreen() {
           <h1 class={`text-4xl font-display mb-1 ${rating.color}`}>
             {rating.label}
           </h1>
-          <p class="text-white/50 text-sm">
+          <p class="text-white/60 text-sm">
             {MODE_LABELS[results.mode]} ·{" "}
             {DIFFICULTY_LABELS[results.difficulty]}
           </p>
@@ -107,11 +107,11 @@ export default function SummaryScreen() {
 
         {/* Question breakdown */}
         {results.results.length > 0 && (
-          <div class="bg-white/8 rounded-2xl overflow-hidden mb-6">
+          <div class="bg-white/10 rounded-2xl overflow-hidden mb-6">
             <div class="px-4 py-3 border-b border-white/10">
               <h2 class="font-bold text-white text-sm">Question breakdown</h2>
             </div>
-            <div class="divide-y divide-white/8">
+            <div class="divide-y divide-white/10">
               {results.results.map((r, i) => (
                 <div
                   key={i}
@@ -126,7 +126,7 @@ export default function SummaryScreen() {
                     {r.question} ={" "}
                     <span class="text-yellow-400 font-bold">{r.answer}</span>
                   </span>
-                  <span class="text-white/35 text-xs tabular-nums">
+                  <span class="text-white/50 text-xs tabular-nums">
                     {r.reactionMs > 0
                       ? `${(r.reactionMs / 1000).toFixed(1)}s`
                       : "timeout"}
@@ -191,7 +191,7 @@ interface StatCardProps {
 function StatCard({ value, label, sub, highlight, color }: StatCardProps) {
   return (
     <div
-      class={`rounded-2xl text-center ${highlight ? "p-6 bg-yellow-400/10 border-2 border-yellow-400/50" : "p-4 bg-white/8"}`}
+      class={`rounded-2xl text-center ${highlight ? "p-6 bg-yellow-400/10 border-2 border-yellow-400/50" : "p-4 bg-white/10"}`}
     >
       <div
         class={`font-display mb-0.5 ${highlight ? "text-5xl" : "text-3xl"} ${color ?? (highlight ? "text-yellow-400" : "text-white")}`}
@@ -205,7 +205,7 @@ function StatCard({ value, label, sub, highlight, color }: StatCardProps) {
       </div>
       {sub && (
         <div
-          class={`text-white/45 mt-0.5 ${highlight ? "text-sm" : "text-xs"}`}
+          class={`text-white/60 mt-0.5 ${highlight ? "text-sm" : "text-xs"}`}
         >
           {sub}
         </div>

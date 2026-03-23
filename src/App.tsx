@@ -50,7 +50,7 @@ export const calibrationData = signal<CalibrationData | null>(
 
 export default function App() {
   return (
-    <div class="w-screen bg-slate-900">
+    <div class="w-screen h-screen bg-indigo-950">
       {screen.value === "home" && <HomeScreen />}
       {screen.value === "calibration" && <CalibrationScreen />}
       {screen.value === "playing" && <GameScreen />}

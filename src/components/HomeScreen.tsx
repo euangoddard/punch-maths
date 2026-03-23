@@ -79,14 +79,14 @@ export default function HomeScreen() {
         <h1 class="text-7xl font-display tracking-tight text-white mb-2 leading-none">
           PUNCH<span class="text-yellow-400">MATHS</span>
         </h1>
-        <p class="text-white/55 text-base">
+        <p class="text-white/60 text-base">
           Punch the right answer before time runs out
         </p>
       </div>
 
       {/* Mode selection */}
       <div class="w-full max-w-md mb-5">
-        <p class="text-white/45 text-sm font-semibold uppercase tracking-wider mb-3 text-center">
+        <p class="text-white/60 text-sm font-semibold uppercase tracking-wider mb-3 text-center">
           Mode
         </p>
         <div class="grid grid-cols-2 gap-3">
@@ -130,7 +130,7 @@ export default function HomeScreen() {
 
       {/* Difficulty selection */}
       <div class="w-full max-w-md mb-3">
-        <p class="text-white/45 text-sm font-semibold uppercase tracking-wider mb-3 text-center">
+        <p class="text-white/60 text-sm font-semibold uppercase tracking-wider mb-3 text-center">
           Difficulty
         </p>
         <div class="grid grid-cols-3 gap-3">
@@ -142,12 +142,12 @@ export default function HomeScreen() {
               class={`p-3 rounded-xl border-2 transition-all text-center ${
                 difficulty === d.value
                   ? d.activeClass
-                  : "border-white/10 bg-white/5 text-white/55 hover:border-white/25"
+                  : "border-white/10 bg-white/5 text-white/60 hover:border-white/25"
               }`}
             >
               <div class="text-2xl mb-1">{d.emoji}</div>
               <div class="font-bold text-sm">{d.label}</div>
-              <div class="text-xs text-white/45 mt-0.5 leading-tight">
+              <div class="text-xs text-white/60 mt-0.5 leading-tight">
                 {d.desc}
               </div>
             </button>
@@ -157,9 +157,9 @@ export default function HomeScreen() {
 
       {/* Mechanic hint — always visible, one sentence */}
       <div class="w-full max-w-md mb-4">
-        <div class="flex items-center gap-3 bg-white/5 border border-white/8 rounded-2xl px-4 py-3">
+        <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
           <span class="text-2xl flex-shrink-0">👊</span>
-          <p class="text-white/65 text-sm leading-snug">
+          <p class="text-white/70 text-sm leading-snug">
             Punch or swipe toward the corner showing the right answer — or just
             tap it on screen.
           </p>
@@ -188,13 +188,13 @@ export default function HomeScreen() {
       <button
         type="button"
         onClick={() => setShowKeyboardNote((v) => !v)}
-        class="mt-4 text-white/40 text-sm hover:text-white/70 transition-colors"
+        class="mt-4 text-white/60 text-sm hover:text-white/80 transition-colors"
       >
         How to play {showKeyboardNote ? "▲" : "▼"}
       </button>
 
       {showKeyboardNote && (
-        <div class="mt-3 bg-white/8 rounded-xl p-4 max-w-md w-full text-sm text-white/70">
+        <div class="mt-3 bg-white/10 rounded-xl p-4 max-w-md w-full text-sm text-white/70">
           <p class="font-semibold text-white mb-2">Camera mode:</p>
           <p class="mb-3">
             Punch or swipe your hand toward the corner of the screen with the
@@ -207,7 +207,7 @@ export default function HomeScreen() {
             <span class="bg-white/10 rounded px-2 py-1">Z → Bottom Left</span>
             <span class="bg-white/10 rounded px-2 py-1">C → Bottom Right</span>
           </div>
-          <p class="mt-2 text-white/45">
+          <p class="mt-2 text-white/60">
             Or tap/click any quadrant on touch screens.
           </p>
         </div>
@@ -240,12 +240,12 @@ function ModeCard({
       class={`p-4 rounded-xl border-2 transition-all text-left ${
         active
           ? `${activeColorClass} text-white`
-          : "border-white/10 bg-white/5 text-white/55 hover:border-white/25"
+          : "border-white/10 bg-white/5 text-white/60 hover:border-white/25"
       }`}
     >
       <div class="text-2xl mb-1">{emoji}</div>
       <div class="font-bold">{title}</div>
-      <div class="text-xs text-white/45 mt-0.5">{desc}</div>
+      <div class="text-xs text-white/60 mt-0.5">{desc}</div>
     </button>
   );
 }

@@ -9,6 +9,12 @@
   --animate-flash-red: flashRed 0.4s ease-out;
 }
 
+:root {
+  /* Semantic game colors — referenced in keyframes so they stay in sync */
+  --color-correct-rgb: 34, 197, 94;   /* green-500 */
+  --color-wrong-rgb: 239, 68, 68;     /* red-500 */
+}
+
 @keyframes bounceIn {
   0% {
     transform: scale(0.8);
@@ -38,25 +44,25 @@
 
 @keyframes flashGreen {
   0% {
-    background-color: rgba(34, 197, 94, 0);
+    background-color: rgba(var(--color-correct-rgb), 0);
   }
   30% {
-    background-color: rgba(34, 197, 94, 0.6);
+    background-color: rgba(var(--color-correct-rgb), 0.6);
   }
   100% {
-    background-color: rgba(34, 197, 94, 0);
+    background-color: rgba(var(--color-correct-rgb), 0);
   }
 }
 
 @keyframes flashRed {
   0% {
-    background-color: rgba(239, 68, 68, 0);
+    background-color: rgba(var(--color-wrong-rgb), 0);
   }
   30% {
-    background-color: rgba(239, 68, 68, 0.6);
+    background-color: rgba(var(--color-wrong-rgb), 0.6);
   }
   100% {
-    background-color: rgba(239, 68, 68, 0);
+    background-color: rgba(var(--color-wrong-rgb), 0);
   }
 }
 
@@ -78,6 +84,12 @@
     color: white;
     font-family: "Nunito", system-ui, -apple-system, sans-serif;
     line-height: 1.6;
+  }
+
+  :focus-visible {
+    outline: 2px solid #facc15; /* yellow-400 */
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 

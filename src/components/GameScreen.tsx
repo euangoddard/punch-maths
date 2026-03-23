@@ -453,6 +453,7 @@ export default function GameScreen() {
               }
               screen.value = "home";
             }}
+            aria-label="Quit game"
             class="w-8 h-8 flex items-center justify-center rounded-full bg-black/50 text-white/60 hover:text-white text-sm font-bold transition-colors"
           >
             ✕
@@ -468,7 +469,7 @@ export default function GameScreen() {
               {score}
             </span>
             {!isTimeAttack && (
-              <span class="text-white/40 text-sm tabular-nums">
+              <span class="text-white/60 text-sm tabular-nums">
                 {Math.min(questionIndex + 1, CLASSIC_TOTAL)}/{CLASSIC_TOTAL}
               </span>
             )}
@@ -486,7 +487,7 @@ export default function GameScreen() {
         {/* Time Attack: big countdown */}
         {isTimeAttack && phase !== "loading" && (
           <div
-            class={`text-center py-1 text-3xl font-display tabular-nums ${timerWarn ? "text-red-400" : "text-white/50"}`}
+            class={`text-center py-1 text-3xl font-display tabular-nums ${timerWarn ? "text-red-400" : "text-white/60"}`}
           >
             {timeLeft}s
           </div>
@@ -507,7 +508,7 @@ export default function GameScreen() {
               <button
                 type="button"
                 key={pos.id}
-                class={`${pos.gridClass} ${pos.border} border-white/10 relative flex p-4 md:p-6 outline-none transition-colors duration-200
+                class={`${pos.gridClass} ${pos.border} border-white/10 relative flex p-4 md:p-6 transition-colors duration-200
                     ${showGreen ? "bg-green-500/35" : ""}
                     ${showRed ? "bg-red-500/35" : ""}
                     ${!feedback ? "active:bg-white/10" : ""}
@@ -597,7 +598,7 @@ export default function GameScreen() {
           ) : (
             <div class="flex flex-col items-center gap-4">
               <div class="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-              <p class="text-white/50 text-sm">Loading hand detection model…</p>
+              <p class="text-white/60 text-sm">Loading hand detection model…</p>
             </div>
           )}
         </div>
