@@ -20,8 +20,10 @@
     "@biomejs/biome": "2.4.8",
     "@preact/preset-vite": "^2.10.5",
     "@tailwindcss/vite": "^4.2.2",
+    "preact-render-to-string": "^6.6.6",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
-    "vite": "^8.0.1"
+    "vite": "^8.0.1",
+    "vite-prerender-plugin": "^0.5.13"
   }
 }

@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import tailwindcss from '@tailwindcss/vite'
+import { vitePrerenderPlugin } from 'vite-prerender-plugin'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  plugins: [tailwindcss(), preact()],
+  plugins: [tailwindcss(), preact(), vitePrerenderPlugin({ renderTarget: '#app' })],
   resolve: {
     alias: {
       // @mediapipe/tasks-vision has a malformed exports field that Rolldown rejects;
