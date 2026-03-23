@@ -1,5 +1,6 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import preact from '@astrojs/preact';
+import critters from 'astro-critters';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -7,7 +8,7 @@ import path from 'path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  integrations: [preact()],
+  integrations: [preact(), critters()],
   fonts: [
     {
       provider: fontProviders.google(),
