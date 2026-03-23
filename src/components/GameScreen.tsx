@@ -548,38 +548,38 @@ export default function GameScreen() {
                 <div class="text-5xl md:text-7xl font-display text-white leading-none">
                   {currentQ.text}
                 </div>
-                {!isTimeAttack && phase === "question" && (
-                  <div
-                    class={`text-4xl font-display mt-2 tabular-nums leading-none transition-colors ${
-                      timerUrgent
-                        ? "text-red-400"
-                        : timerWarn
-                          ? "text-orange-400"
-                          : "text-yellow-400"
-                    }`}
-                  >
-                    {timeLeft}
-                  </div>
-                )}
-              </div>
-
-              {feedback && (
-                <div
-                  class={`mt-3 mx-auto px-5 py-2 rounded-xl font-bold text-base inline-block ${
-                    feedback.correct
-                      ? "bg-green-500 text-white"
-                      : "bg-red-500 text-white"
-                  }`}
-                >
-                  {feedback.correct
-                    ? streak.current >= 3
-                      ? `🔥 ${streak.current} streak!`
-                      : "✓ Correct!"
-                    : feedback.chosenQ
-                      ? `✗ Answer: ${currentQ.answer}`
-                      : `⏰ Time up! Answer: ${currentQ.answer}`}
+                <div class="mt-2 min-h-[2.75rem] flex items-center justify-center">
+                  {!isTimeAttack && phase === "question" ? (
+                    <div
+                      class={`text-4xl font-display tabular-nums leading-none transition-colors ${
+                        timerUrgent
+                          ? "text-red-400"
+                          : timerWarn
+                            ? "text-orange-400"
+                            : "text-yellow-400"
+                      }`}
+                    >
+                      {timeLeft}
+                    </div>
+                  ) : feedback ? (
+                    <div
+                      class={`px-5 py-1.5 rounded-xl font-bold text-base ${
+                        feedback.correct
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {feedback.correct
+                        ? streak.current >= 3
+                          ? `🔥 ${streak.current} streak!`
+                          : "✓ Correct!"
+                        : feedback.chosenQ
+                          ? `✗ Answer: ${currentQ.answer}`
+                          : `⏰ Time up! Answer: ${currentQ.answer}`}
+                    </div>
+                  ) : null}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
