@@ -81,7 +81,7 @@ export default function HomeScreen() {
         <div class="text-8xl mb-2" role="img" aria-label="punch">
           👊
         </div>
-        <h1 class="text-7xl font-display tracking-tight text-white mb-2 leading-none">
+        <h1 class="text-5xl sm:text-7xl font-display tracking-tight text-white mb-2 leading-none">
           PUNCH<span class="text-yellow-400">MATHS</span>
         </h1>
         <p class="text-white/60 text-base">
