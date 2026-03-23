@@ -10,10 +10,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "types": ["astro/client"],
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "paths": {
-      "@mediapipe/tasks-vision": ["./node_modules/@mediapipe/tasks-vision/vision.d.ts"]
+      "@mediapipe/tasks-vision": ["./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs"]
     }
   },
-  "include": ["src"]
+  "include": ["src", ".astro"]
 }

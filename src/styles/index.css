@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-family-display: "Anton", system-ui, sans-serif;
+  --font-family-display: var(--font-display), system-ui, sans-serif;
   --animate-pulse-fast: pulse 0.5s ease-in-out;
   --animate-bounce-in: bounceIn 0.3s ease-out;
   --animate-shake: shake 0.4s ease-in-out;
@@ -11,8 +11,8 @@
 
 :root {
   /* Semantic game colors — referenced in keyframes so they stay in sync */
-  --color-correct-rgb: 34, 197, 94;   /* green-500 */
-  --color-wrong-rgb: 239, 68, 68;     /* red-500 */
+  --color-correct-rgb: 34, 197, 94; /* green-500 */
+  --color-wrong-rgb: 239, 68, 68; /* red-500 */
 }
 
 @keyframes bounceIn {
@@ -74,15 +74,14 @@
     padding: 0;
   }
 
-  body,
-  #app {
+  body {
     min-height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
     background: #1e1b4b;
     color: white;
-    font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body), system-ui, -apple-system, sans-serif;
     line-height: 1.6;
   }
 

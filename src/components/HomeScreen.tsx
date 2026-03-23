@@ -1,5 +1,10 @@
 import { useState } from "preact/hooks";
-import { calibrationData, calibrationReturnTo, gameConfig, screen } from "../App";
+import {
+  calibrationData,
+  calibrationReturnTo,
+  gameConfig,
+  screen,
+} from "../App";
 import { unlockAudio } from "../audio/sounds";
 import { DEFAULT_QUESTION_TIMER } from "../constants";
 import type { GameMode } from "../types";
