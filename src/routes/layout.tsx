@@ -51,5 +51,9 @@ export default component$(() => {
     }
   });
 
-  return <Slot />;
+  return (
+    <main>
+      <Slot />
+    </main>
+  );
 });
