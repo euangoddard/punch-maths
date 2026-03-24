@@ -4,6 +4,7 @@ import {
   useSignal,
   useStore,
   useVisibleTask$,
+  $,
 } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { useNavigate } from "@builder.io/qwik-city";
@@ -97,7 +98,7 @@ export default component$(() => {
     overlay: null,
   });
 
-  function completeAndNavigate() {
+  const completeAndNavigate = $(() => {
     saveCalibrationToStorage();
     calibrationData.value = { calibratedAt: Date.now() };
     const dest = calibrationReturnTo.value;
@@ -107,7 +108,7 @@ export default component$(() => {
       t.stop();
     }
     nav(dest);
-  }
+  });
 
   // Start camera on mount
   // biome-ignore lint/correctness/noQwikUseVisibleTask: camera access requires browser API
