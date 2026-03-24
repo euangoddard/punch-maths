@@ -1,10 +1,14 @@
-import { gameConfig, gameResults, screen } from "../App";
+import { component$, useContext } from "@builder.io/qwik";
+import type { DocumentHead } from "@builder.io/qwik-city";
+import { useNavigate } from "@builder.io/qwik-city";
+import { GameConfigContext, GameResultsContext } from "../../context/game";
 
 const DIFFICULTY_LABELS: Record<number, string> = {
   1: "Easy",
   2: "Medium",
   3: "Hard",
 };
+
 const MODE_LABELS: Record<string, string> = {
   classic: "Classic",
   "time-attack": "Time Attack",
@@ -30,9 +34,13 @@ function getRating(accuracy: number, avgReaction: number) {
   };
 }
 
-export default function SummaryScreen() {
-  const results = gameResults.value;
-  const config = gameConfig.value;
+export default component$(() => {
+  const gameResultsSignal = useContext(GameResultsContext);
+  const gameConfigSignal = useContext(GameConfigContext);
+  const nav = useNavigate();
+
+  const results = gameResultsSignal.value;
+  const config = gameConfigSignal.value;
 
   if (!results) {
     return null;
@@ -56,7 +64,7 @@ export default function SummaryScreen() {
           </p>
         </div>
 
-        {/* Main stats — score hero + secondary row */}
+        {/* Score hero */}
         <div class="mb-3">
           <StatCard
             value={results.score}
@@ -69,6 +77,8 @@ export default function SummaryScreen() {
             highlight
           />
         </div>
+
+        {/* Secondary stats */}
         <div class="grid grid-cols-3 gap-3 mb-6">
           <StatCard
             value={`${results.accuracy}%`}
@@ -115,10 +125,16 @@ export default function SummaryScreen() {
               {results.results.map((r, i) => (
                 <div
                   key={i}
-                  class={`flex items-center gap-3 px-4 py-2.5 border-l-2 ${r.correct ? "border-emerald-500" : "border-red-500"}`}
+                  class={[
+                    "flex items-center gap-3 px-4 py-2.5 border-l-2",
+                    r.correct ? "border-emerald-500" : "border-red-500",
+                  ]}
                 >
                   <span
-                    class={`text-lg ${r.correct ? "text-emerald-400" : "text-red-400"}`}
+                    class={[
+                      "text-lg",
+                      r.correct ? "text-emerald-400" : "text-red-400",
+                    ]}
                   >
                     {r.correct ? "✓" : "✗"}
                   </span>
@@ -137,12 +153,12 @@ export default function SummaryScreen() {
           </div>
         )}
 
-        {/* Action buttons */}
+        {/* Actions */}
         <div class="flex flex-col gap-3">
           <button
             type="button"
-            onClick={() => {
-              screen.value = "playing";
+            onClick$={() => {
+              nav("/play");
             }}
             class="btn-primary"
           >
@@ -150,8 +166,8 @@ export default function SummaryScreen() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              screen.value = "home";
+            onClick$={() => {
+              nav("/");
             }}
             class="btn-secondary"
           >
@@ -159,7 +175,7 @@ export default function SummaryScreen() {
           </button>
         </div>
 
-        {/* Encouragement message */}
+        {/* Contextual tips */}
         {results.accuracy < 60 && (
           <div class="mt-4 bg-blue-900/50 border border-blue-700/50 rounded-xl p-4 text-sm text-blue-200">
             <p class="font-semibold text-blue-300 mb-1">💡 Tip</p>
@@ -178,7 +194,7 @@ export default function SummaryScreen() {
       </div>
     </div>
   );
-}
+});
 
 interface StatCardProps {
   value: string | number;
@@ -188,28 +204,44 @@ interface StatCardProps {
   color?: string;
 }
 
-function StatCard({ value, label, sub, highlight, color }: StatCardProps) {
-  return (
+const StatCard = component$<StatCardProps>(
+  ({ value, label, sub, highlight, color }) => (
     <div
-      class={`rounded-2xl text-center ${highlight ? "p-6 bg-yellow-400/10 border-2 border-yellow-400/50" : "p-4 bg-white/10"}`}
+      class={[
+        "rounded-2xl text-center",
+        highlight
+          ? "p-6 bg-yellow-400/10 border-2 border-yellow-400/50"
+          : "p-4 bg-white/10",
+      ]}
     >
       <div
-        class={`font-display mb-0.5 ${highlight ? "text-5xl" : "text-3xl"} ${color ?? (highlight ? "text-yellow-400" : "text-white")}`}
+        class={[
+          "font-display mb-0.5",
+          highlight ? "text-5xl" : "text-3xl",
+          color ?? (highlight ? "text-yellow-400" : "text-white"),
+        ]}
       >
         {value}
       </div>
       <div
-        class={`text-white font-semibold ${highlight ? "text-base" : "text-sm"}`}
+        class={[
+          "text-white font-semibold",
+          highlight ? "text-base" : "text-sm",
+        ]}
       >
         {label}
       </div>
       {sub && (
         <div
-          class={`text-white/60 mt-0.5 ${highlight ? "text-sm" : "text-xs"}`}
+          class={["text-white/60 mt-0.5", highlight ? "text-sm" : "text-xs"]}
         >
           {sub}
         </div>
       )}
     </div>
-  );
-}
+  ),
+);
+
+export const head: DocumentHead = {
+  title: "Results — Punch Maths",
+};

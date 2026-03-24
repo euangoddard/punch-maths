@@ -1,7 +1,19 @@
-import { useEffect, useRef, useState } from "preact/hooks";
-import { calibrationReturnTo, saveCalibration, screen } from "../App";
-import { HandOverlay } from "../detection/handOverlay";
-import type { Quadrant } from "../types";
+import {
+  component$,
+  useContext,
+  useSignal,
+  useStore,
+  useVisibleTask$,
+} from "@builder.io/qwik";
+import type { DocumentHead } from "@builder.io/qwik-city";
+import { useNavigate } from "@builder.io/qwik-city";
+import { CALIBRATION_STORAGE_KEY } from "../../constants";
+import {
+  CalibrationContext,
+  CalibrationReturnToContext,
+} from "../../context/game";
+import { HandOverlay } from "../../detection/handOverlay";
+import type { Quadrant } from "../../types";
 
 type CalibrationStep = "setup" | "loading" | "hitting" | "done";
 
@@ -52,95 +64,81 @@ const QUADRANT_META: Record<
   },
 };
 
-export default function CalibrationScreen() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const overlayRef = useRef<HandOverlay | null>(null);
-  const [step, setStep] = useState<CalibrationStep>("setup");
-  const [cameraError, setCameraError] = useState(false);
-  const [hitQuadrants, setHitQuadrants] = useState<Set<Quadrant>>(new Set());
+function saveCalibrationToStorage(): void {
+  try {
+    localStorage.setItem(
+      CALIBRATION_STORAGE_KEY,
+      JSON.stringify({ calibratedAt: Date.now() }),
+    );
+  } catch {
+    // localStorage may be unavailable
+  }
+}
 
-  useEffect(() => {
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "user",
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-          },
-        });
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
-      } catch {
-        setCameraError(true);
-      }
+export default component$(() => {
+  const calibrationData = useContext(CalibrationContext);
+  const calibrationReturnTo = useContext(CalibrationReturnToContext);
+  const nav = useNavigate();
+
+  const step = useSignal<CalibrationStep>("setup");
+  const cameraError = useSignal(false);
+  const hitQuadrants = useSignal<Set<Quadrant>>(new Set());
+
+  // DOM element refs — stored as plain signals so useVisibleTask$ can read them
+  const videoEl = useSignal<HTMLVideoElement | undefined>();
+  const canvasEl = useSignal<HTMLCanvasElement | undefined>();
+
+  // Mutable browser resources (not reactive, not serialised)
+  const refs = useStore<{
+    stream: MediaStream | null;
+    overlay: HandOverlay | null;
+  }>({
+    stream: null,
+    overlay: null,
+  });
+
+  function completeAndNavigate() {
+    saveCalibrationToStorage();
+    calibrationData.value = { calibratedAt: Date.now() };
+    const dest = calibrationReturnTo.value;
+    calibrationReturnTo.value = "/play";
+    refs.overlay?.stop();
+    for (const t of refs.stream?.getTracks() ?? []) {
+      t.stop();
     }
-    startCamera();
+    nav(dest);
+  }
 
-    return () => {
-      overlayRef.current?.stop();
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-    };
-  }, []);
-
-  async function handleReady() {
-    setStep("loading");
+  // Start camera on mount
+  // biome-ignore lint/correctness/noQwikUseVisibleTask: camera access requires browser API
+  useVisibleTask$(async ({ cleanup }) => {
     try {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      if (!video || !canvas) {
-        setStep("done");
-        return;
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
+      });
+      refs.stream = stream;
+      const vid = videoEl.value;
+      if (vid) {
+        vid.srcObject = stream;
+        await vid.play();
       }
-      const overlay = new HandOverlay(video, canvas, { onPunch: handlePunch });
-      overlayRef.current = overlay;
-      await overlay.init();
-      overlay.start();
-      setStep("hitting");
     } catch {
-      // Model failed to load — skip straight to done
-      setStep("done");
+      cameraError.value = true;
     }
-  }
 
-  function handlePunch(quadrant: Quadrant) {
-    setHitQuadrants((prev) => {
-      const next = new Set(prev);
-      next.add(quadrant);
-      if (next.size === ALL_QUADRANTS.length) {
-        setTimeout(() => setStep("done"), 600);
+    cleanup(() => {
+      refs.overlay?.stop();
+      for (const t of refs.stream?.getTracks() ?? []) {
+        t.stop();
       }
-      return next;
     });
-  }
+  });
 
-  function handleFinish() {
-    saveCalibration({ calibratedAt: Date.now() });
-    stopAll();
-    const dest = calibrationReturnTo.value;
-    calibrationReturnTo.value = "playing";
-    screen.value = dest;
-  }
-
-  function handleSkip() {
-    saveCalibration({ calibratedAt: Date.now() });
-    stopAll();
-    const dest = calibrationReturnTo.value;
-    calibrationReturnTo.value = "playing";
-    screen.value = dest;
-  }
-
-  function stopAll() {
-    overlayRef.current?.stop();
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-  }
-
-  if (cameraError) {
+  if (cameraError.value) {
     return (
       <div class="h-screen flex flex-col items-center justify-center bg-indigo-950 px-6 text-center">
         <div class="text-6xl mb-4">📷</div>
@@ -150,14 +148,15 @@ export default function CalibrationScreen() {
         </p>
         <button
           type="button"
-          onClick={() => {
-            saveCalibration({
+          onClick$={() => {
+            saveCalibrationToStorage();
+            calibrationData.value = {
               calibratedAt: Date.now(),
               noCamera: true,
-            });
+            };
             const dest = calibrationReturnTo.value;
-            calibrationReturnTo.value = "playing";
-            screen.value = dest;
+            calibrationReturnTo.value = "/play";
+            nav(dest);
           }}
           class="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold rounded-xl transition-all"
         >
@@ -171,34 +170,35 @@ export default function CalibrationScreen() {
     <div class="screen-container bg-indigo-950">
       {/* Full-screen camera feed */}
       <video
-        ref={videoRef}
+        ref={videoEl}
         class="overlay-fill object-cover video-mirror opacity-70"
         muted
         playsInline
-        autoPlay
+        autoplay
       />
       <canvas
-        ref={canvasRef}
+        ref={canvasEl}
         class="overlay-fill video-mirror pointer-events-none"
       />
 
-      {/* Quadrant targets — full-screen grid so corners align with actual hit zones */}
-      {step === "hitting" && (
+      {/* Quadrant targets */}
+      {step.value === "hitting" && (
         <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 pointer-events-none">
           {ALL_QUADRANTS.map((q) => {
             const meta = QUADRANT_META[q];
-            const hit = hitQuadrants.has(q);
+            const hit = hitQuadrants.value.has(q);
             return (
               <div
                 key={q}
                 class={`${meta.gridClass} ${meta.border} border-white/15 flex ${meta.alignClass} ${meta.padding}`}
               >
                 <div
-                  class={`w-20 h-20 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                  class={[
+                    "w-20 h-20 rounded-full border-2 flex items-center justify-center transition-all duration-300",
                     hit
                       ? "bg-green-500 border-green-400 scale-110"
-                      : "bg-yellow-400/20 border-yellow-400 animate-pulse"
-                  }`}
+                      : "bg-yellow-400/20 border-yellow-400 animate-pulse",
+                  ]}
                 >
                   {hit ? (
                     <span class="text-white text-3xl font-bold">✓</span>
@@ -213,7 +213,7 @@ export default function CalibrationScreen() {
       )}
 
       {/* Loading spinner overlay */}
-      {step === "loading" && (
+      {step.value === "loading" && (
         <div class="absolute inset-0 flex items-center justify-center bg-black/40">
           <div class="text-center">
             <div class="w-14 h-14 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -228,7 +228,7 @@ export default function CalibrationScreen() {
       <div class="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-6 pt-6 pb-3">
         <button
           type="button"
-          onClick={handleSkip}
+          onClick$={completeAndNavigate}
           class="text-white/60 hover:text-white text-sm transition-colors"
         >
           Skip calibration
@@ -236,9 +236,9 @@ export default function CalibrationScreen() {
         <span class="text-white/60 text-sm">Camera Setup</span>
       </div>
 
-      {/* Bottom panel — instructions + action */}
+      {/* Bottom panel */}
       <div class="absolute bottom-0 left-0 right-0 z-10 px-6 pb-8 pt-6 bg-gradient-to-t from-indigo-950/95 via-indigo-950/80 to-transparent">
-        {step === "setup" && (
+        {step.value === "setup" && (
           <>
             <h2 class="text-xl font-bold text-white mb-1">Set up your space</h2>
             <p class="text-white/60 mb-5 text-sm">
@@ -261,7 +261,36 @@ export default function CalibrationScreen() {
             </div>
             <button
               type="button"
-              onClick={handleReady}
+              onClick$={async () => {
+                step.value = "loading";
+                try {
+                  const vid = videoEl.value;
+                  const canvas = canvasEl.value;
+                  if (!vid || !canvas) {
+                    step.value = "done";
+                    return;
+                  }
+                  const overlay = new HandOverlay(vid, canvas, {
+                    onPunch: (quadrant: Quadrant) => {
+                      const next = new Set(hitQuadrants.value);
+                      next.add(quadrant);
+                      hitQuadrants.value = next;
+                      if (next.size === ALL_QUADRANTS.length) {
+                        setTimeout(() => {
+                          step.value = "done";
+                        }, 600);
+                      }
+                    },
+                  });
+                  refs.overlay = overlay;
+                  await overlay.init();
+                  overlay.start();
+                  step.value = "hitting";
+                } catch {
+                  // Model failed to load — skip straight to done
+                  step.value = "done";
+                }
+              }}
               class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold text-lg rounded-2xl transition-all active:scale-95"
             >
               I'm ready →
@@ -269,13 +298,13 @@ export default function CalibrationScreen() {
           </>
         )}
 
-        {step === "loading" && (
+        {step.value === "loading" && (
           <p class="text-white/60 text-center text-sm">
             Loading hand detection model…
           </p>
         )}
 
-        {step === "hitting" && (
+        {step.value === "hitting" && (
           <>
             <h2 class="text-xl font-bold text-white mb-1">Hit each corner!</h2>
             <p class="text-white/60 text-sm mb-4">
@@ -286,25 +315,30 @@ export default function CalibrationScreen() {
               {ALL_QUADRANTS.map((q) => (
                 <div
                   key={q}
-                  class={`flex-1 h-2 rounded-full transition-all duration-300 ${
-                    hitQuadrants.has(q) ? "bg-green-500" : "bg-white/20"
-                  }`}
+                  class={[
+                    "flex-1 h-2 rounded-full transition-all duration-300",
+                    hitQuadrants.value.has(q) ? "bg-green-500" : "bg-white/20",
+                  ]}
                 />
               ))}
             </div>
             <p class="text-white/50 text-xs text-center mt-2">
-              {hitQuadrants.size} / {ALL_QUADRANTS.length} corners hit
+              {hitQuadrants.value.size} / {ALL_QUADRANTS.length} corners hit
             </p>
           </>
         )}
 
-        {step === "done" && (
+        {step.value === "done" && (
           <>
             <h2 class="text-xl font-bold text-white mb-1">All set! 🎉</h2>
             <p class="text-white/60 text-sm mb-5">
               Hand detection is working. You're ready to play!
             </p>
-            <button type="button" onClick={handleFinish} class="btn-primary">
+            <button
+              type="button"
+              onClick$={completeAndNavigate}
+              class="btn-primary"
+            >
               Let's play! 👊
             </button>
           </>
@@ -312,4 +346,8 @@ export default function CalibrationScreen() {
       </div>
     </div>
   );
-}
+});
+
+export const head: DocumentHead = {
+  title: "Camera Setup — Punch Maths",
+};

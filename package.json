@@ -4,25 +4,32 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "lint": "biome check",
+    "build": "npm run build.client && npm run build.server",
+    "build.client": "vite build",
+    "build.server": "qwik check-client src dist && vite build -c adapters/static/vite.config.ts",
+    "check": "biome check --fix",
+    "dev": "vite --mode ssr",
     "format": "biome format --fix",
-    "check": "biome check --fix"
+    "lint": "biome check",
+    "preview": "vite preview --open",
+    "qwik": "qwik"
   },
   "dependencies": {
-    "@astrojs/preact": "^5.0.2",
+    "@builder.io/qwik": "^1.19.2",
+    "@builder.io/qwik-city": "^1.19.2",
     "@mediapipe/tasks-vision": "^0.10.33",
-    "@preact/signals": "^2.8.2",
-    "astro": "^6.0.8",
-    "preact": "^10.29.0"
+    "globals": "^17.4.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.8",
     "@tailwindcss/vite": "^4.2.2",
-    "astro-critters": "^2.2.1",
+    "@types/node": "^25.5.0",
+    "ignore": "^7.0.5",
     "tailwindcss": "^4.2.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-plugin-css-modules": "^5.2.0",
+    "undici": "*",
+    "vite": "^7.3.1",
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }

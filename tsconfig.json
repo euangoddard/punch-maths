@@ -1,20 +1,26 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "lib": ["es2022", "DOM", "WebWorker", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
+    "jsxImportSource": "@builder.io/qwik",
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "types": ["astro/client"],
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "incremental": true,
+    "isolatedModules": true,
+    "outDir": "tmp",
+    "noEmit": true,
     "paths": {
-      "@mediapipe/tasks-vision": ["./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs"]
+      "@mediapipe/tasks-vision": [
+        "./node_modules/@mediapipe/tasks-vision/vision.d.ts"
+      ],
+      "~/*": ["./src/*"]
     }
   },
-  "include": ["src", ".astro"]
+  "include": ["src", "./*.d.ts", "./*.config.ts"]
 }
